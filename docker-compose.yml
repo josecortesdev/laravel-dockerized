@@ -31,7 +31,20 @@ services:
       - ./src/:/var/www/html
     # command: sh -c "chown -R laravel:laravel /var/www/html/storage /var/www/html/bootstrap/cache && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && php-fpm -y /usr/local/etc/php-fpm.d/www.conf -R"
     command: sh -c "chown -R laravel:laravel /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache && chmod 664 /var/www/html/database/database.sqlite && php-fpm -F -y /usr/local/etc/php-fpm.d/www.conf -R"
-
+  redis:
+      image: redis:alpine
+      ports:
+        - 6379:6379
+  queue-worker:
+      build:
+        context: .
+        dockerfile: php.dockerfile
+      volumes:
+        - ./src/:/var/www/html
+      depends_on:
+        - mysql
+        - redis
+      command: php /var/www/html/artisan queue:work
   composer:
     build: 
       context: .
@@ -55,5 +68,6 @@ services:
     working_dir: /var/www/html
     depends_on: 
       - mysql
-    entrypoint: ["php", "/var/www/html/artisan"]
+    # entrypoint: ["php", "/var/www/html/artisan"]
+    command: tail -f /dev/null
     

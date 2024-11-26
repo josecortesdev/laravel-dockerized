@@ -19,7 +19,9 @@ RUN mkdir -p /var/www/html/storage/framework/views
 RUN mkdir -p /var/www/html/bootstrap/cache
 RUN mkdir -p /var/www/html/database
 
+RUN apk add --no-cache autoconf g++ make
 RUN docker-php-ext-install pdo pdo_mysql 
+RUN pecl install redis && docker-php-ext-enable redis
 
 
 # Crear el archivo database.sqlite si no existe y establecer permisos correctos

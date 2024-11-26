@@ -16,6 +16,18 @@ services:
     build: 
       context: .
       dockerfile: php.prod.dockerfile
+  redis:
+    image: redis:alpine
+  queue-worker:
+    build: 
+      context: .
+      dockerfile: php.prod.dockerfile
+    volumes:
+      - ./src/:/var/www/html
+    depends_on:
+      - mysql
+      - redis
+    command: php /var/www/html/artisan queue:work
   mysql: 
     image: mariadb:10.5
     ports: 
